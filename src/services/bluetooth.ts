@@ -43,7 +43,7 @@ const getNativeModule = () =>
       );
 
 export class Bluetooth {
-  private _bluetooth: typeof NativeModules.BluetoothLe;
+  private _bluetooth: typeof NativeModules.BluetoothLite;
   private _events: NativeEventEmitter;
   private _activeListeners: BluetoothEvent[] = [];
   private _notificationCallbacks: Record<string, AnyCallback | null> = {};
