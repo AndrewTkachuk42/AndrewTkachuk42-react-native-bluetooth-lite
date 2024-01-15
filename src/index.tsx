@@ -1,22 +1,15 @@
-import { NativeModules, Platform } from 'react-native';
+import { useAdapterState as useAdapterStateHook } from './hooks/useAdapterState';
+import { useBluetoothPermission as useBluetoothPermissionHook } from './hooks/useBluetoothPermission';
+import { useConnectionState as useConnectionStateHook } from './hooks/useConnectionState';
+import { useScaner as useScanerHook } from './hooks/useScanner';
+import { Bluetooth as BluetoothModule } from './services/bluetooth';
+import bluetoothManagerSingleton from './services/bluetoothManager';
 
-const LINKING_ERROR =
-  `The package 'react-native-bluetooth-lite' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+export default bluetoothManagerSingleton;
 
-const BluetoothLite = NativeModules.BluetoothLite
-  ? NativeModules.BluetoothLite
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
+export const Bluetooth = BluetoothModule;
 
-export function multiply(a: number, b: number): Promise<number> {
-  return BluetoothLite.multiply(a, b);
-}
+export const useBluetoothPermission = useBluetoothPermissionHook;
+export const useScaner = useScanerHook;
+export const useConnectionState = useConnectionStateHook;
+export const useAdapterState = useAdapterStateHook;

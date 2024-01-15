@@ -1,31 +1,126 @@
-import * as React from 'react';
+import React from 'react';
 
-import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-bluetooth-lite';
+import { StyleSheet, View, Button, Text, SafeAreaView } from 'react-native';
+import { useTextStyle } from './hooks/useTextStyle';
+import type { ConnectionState, PermissionResult } from '../../src/types/types';
+import DeviceList from './DeviceList';
+import { useBluetooth } from './hooks/useBluetooth';
+import { strings } from './constants/strings';
+import {
+  formatAdapterStatus,
+  formatConnectionStatus,
+  formatPermissionStatus,
+} from './utils/format';
 
-export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    multiply(3, 7).then(setResult);
-  }, []);
+const App = () => {
+  const {
+    scan,
+    connect,
+    disconnect,
+    selected,
+    setSelected,
+    isEnabled,
+    connectionState,
+    isConnected,
+    isScanning,
+    devices,
+    isDeviceSelected,
+    permissionStatus,
+  } = useBluetooth();
 
   return (
-    <View style={styles.container}>
-      <Text>Result: {result}</Text>
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Info
+          permissionStatus={permissionStatus}
+          isEnabled={isEnabled}
+          connectionState={connectionState}
+        />
+        <DeviceList
+          devices={devices}
+          selected={selected}
+          setSelected={setSelected}
+        />
+        <Buttons
+          connect={connect}
+          disconnect={disconnect}
+          isConnected={isConnected}
+          isScanning={isScanning}
+          scan={scan}
+          isDeviceSelected={isDeviceSelected}
+        />
+      </View>
+    </SafeAreaView>
   );
-}
+};
+
+export default App;
+
+type InfoProps = {
+  isEnabled: boolean;
+  connectionState: ConnectionState;
+  permissionStatus: PermissionResult | null;
+};
+
+const Info = ({ isEnabled, connectionState, permissionStatus }: InfoProps) => {
+  const textStyle = useTextStyle();
+
+  return (
+    <>
+      <Text style={textStyle}>{formatPermissionStatus(permissionStatus)}</Text>
+      <Text style={textStyle}>{formatAdapterStatus(isEnabled)}</Text>
+      <Text style={textStyle}>{formatConnectionStatus(connectionState)}</Text>
+    </>
+  );
+};
+
+type ButtonsProps = {
+  scan: () => void;
+  connect: () => void;
+  disconnect: () => void;
+  isScanning: boolean;
+  isConnected: boolean;
+  isDeviceSelected: boolean;
+};
+
+const Buttons = ({
+  scan,
+  isScanning,
+  isConnected,
+  disconnect,
+  connect,
+  isDeviceSelected,
+}: ButtonsProps) => (
+  <View style={styles.buttonsWrapper}>
+    <Button title={strings.SCAN} onPress={scan} disabled={isScanning} />
+    <Button
+      title={isConnected ? strings.DISCONNECT : strings.CONNECT}
+      onPress={isConnected ? disconnect : connect}
+      disabled={!isDeviceSelected}
+    />
+  </View>
+);
 
 const styles = StyleSheet.create({
+  safeArea: { flex: 1 },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 16,
+    padding: 16,
   },
-  box: {
-    width: 60,
-    height: 60,
-    marginVertical: 20,
+  deviceList: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: 'gray',
+  },
+  deviceListContentContainer: {
+    padding: 16,
+    flexGrow: 1,
+    gap: 16,
+  },
+  buttonsWrapper: {
+    marginTop: 16,
+    flex: 1,
+    gap: 16,
   },
 });
