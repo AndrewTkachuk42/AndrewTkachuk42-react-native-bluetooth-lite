@@ -23,7 +23,7 @@ class Adapter (reactContext: ReactApplicationContext) {
   }
 
   private val bleScanner by lazy {
-    bluetoothAdapter.bluetoothLiteScanner
+    bluetoothAdapter.bluetoothLeScanner
   }
 
   private val scanSettings = ScanSettings.Builder()

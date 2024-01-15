@@ -1,6 +1,6 @@
 package com.bluetoothlite.constants
 
-import com.bluetoothlite.BluetoothAdapter
+import android.bluetooth.BluetoothAdapter
 import com.bluetoothlite.types.AdapterState
 
 object Constants {

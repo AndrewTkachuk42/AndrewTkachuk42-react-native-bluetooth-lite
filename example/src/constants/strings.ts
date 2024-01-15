@@ -5,7 +5,7 @@ export const strings = {
   CONNECT: 'connect',
   DISCONNECT: 'disconnect',
   NAME: 'name',
-  NO_NAME: 'no ame',
+  NO_NAME: 'no name',
   RSSI: 'rssi',
   PERMISSION_STATUS: 'Permission status',
   NOT_REQUESTED: 'Not requested',
