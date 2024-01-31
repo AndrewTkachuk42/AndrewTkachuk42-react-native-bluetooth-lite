@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import bluetoothManager, {
+import {
   useAdapterState,
   useBluetoothPermission,
   useConnectionState,
   useScaner,
+  bluetoothManager,
 } from 'react-native-bluetooth-lite';
 
 const bluetooth = bluetoothManager.getInstance();

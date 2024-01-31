@@ -16,6 +16,4 @@ class BluetoothManager {
   }
 }
 
-const bluetoothManager = new BluetoothManager();
-
-export default bluetoothManager;
+export const bluetoothManager = new BluetoothManager();
