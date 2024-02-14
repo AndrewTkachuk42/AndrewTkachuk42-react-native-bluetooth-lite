@@ -1,14 +1,20 @@
-import { PermissionsAndroid, type PermissionStatus } from 'react-native';
+import {
+  PermissionsAndroid,
+  NativeModules,
+  type PermissionStatus,
+} from 'react-native';
 import { IS_ANDROID, PLATFORM_VERSION } from '../constants/constants';
-import { AndroidPermissionStatus, PermissionResult } from '../types/types';
+import { AndroidPermissionStatus } from '../types/types';
 
-const processAndroidResult = (results: { [key: string]: PermissionStatus }) => {
+const processAndroidResult = (results: {
+  [key: string]: PermissionStatus;
+}): boolean => {
   const allGranted = Object.values(results).every(
     (status) => status === AndroidPermissionStatus.GRANTED
   );
 
   if (allGranted) {
-    return PermissionResult.GRANTED;
+    return true;
   }
 
   const someBlocked = Object.values(results).some(
@@ -16,13 +22,13 @@ const processAndroidResult = (results: { [key: string]: PermissionStatus }) => {
   );
 
   if (someBlocked) {
-    return PermissionResult.BLOCKED;
+    return false;
   }
 
-  return PermissionResult.DENIED;
+  return false;
 };
 
-export const checkAndroidPermissions = async (): Promise<boolean> => {
+export const checkAndroidPermission = async (): Promise<boolean> => {
   if (IS_ANDROID && PLATFORM_VERSION >= 31) {
     const result = await Promise.all([
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN!),
@@ -43,32 +49,45 @@ export const checkAndroidPermissions = async (): Promise<boolean> => {
   return false;
 };
 
-export const requestAndroidPermissions =
-  async (): Promise<PermissionResult> => {
-    if (IS_ANDROID && PLATFORM_VERSION >= 31) {
-      const result = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN!,
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT!,
-      ]);
+export const requestAndroidPermission = async (): Promise<boolean> => {
+  if (IS_ANDROID && PLATFORM_VERSION >= 31) {
+    const result = await PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN!,
+      PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT!,
+    ]);
 
-      return processAndroidResult(result);
+    return processAndroidResult(result);
+  }
+
+  if (IS_ANDROID && PLATFORM_VERSION >= 23) {
+    const result = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION!
+    );
+
+    if (result === AndroidPermissionStatus.GRANTED) {
+      return true;
     }
 
-    if (IS_ANDROID && PLATFORM_VERSION >= 23) {
-      const result = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION!
-      );
-
-      if (result === AndroidPermissionStatus.GRANTED) {
-        return PermissionResult.GRANTED;
-      }
-
-      if (result === AndroidPermissionStatus.DENIED) {
-        return PermissionResult.DENIED;
-      }
-
-      return PermissionResult.BLOCKED;
+    if (result === AndroidPermissionStatus.DENIED) {
+      return false;
     }
 
-    return PermissionResult.BLOCKED;
-  };
+    return false;
+  }
+
+  return false;
+};
+
+const checkIosPermission = (): Promise<boolean> =>
+  NativeModules.BluetoothLite.checkPermission();
+
+const requestIosPermission = (): Promise<boolean> =>
+  NativeModules.BluetoothLite.requestPermission();
+
+export const checkPermission = IS_ANDROID
+  ? checkAndroidPermission
+  : checkIosPermission;
+
+export const requestPermission = IS_ANDROID
+  ? requestAndroidPermission
+  : requestIosPermission;

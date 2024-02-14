@@ -6,3 +6,5 @@ export const IS_ANDROID = Platform.OS === 'android';
 export const IS_IOS = Platform.OS === 'ios';
 
 export const PLATFORM_VERSION = Number(Platform.Version);
+
+export const APP_ACTIVE = 'active';

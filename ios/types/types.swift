@@ -9,10 +9,6 @@ enum EventType: String {
     case CONNECTION_STATE, ADAPTER_STATE, DEVICE_FOUND, NOTIFICATION
 }
 
-enum PermissionState: String {
-    case GRANTED = "granted", BLOCKED = "blocked", UNKNOWN = "not_requested"
-}
-
 enum ConnectionState: String {
     case DISCONNECTED,
          CONNECTING,

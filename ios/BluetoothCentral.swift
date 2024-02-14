@@ -34,13 +34,13 @@ class BluetoothCentral: NSObject {
         isAdapterEnabled = centralManager.state == .poweredOn
     }
     
-    func getPermissionStatus(resolve: @escaping RCTPromiseResolveBlock) {
+    func checkPermission(resolve: @escaping RCTPromiseResolveBlock) {
         if (state == .UNKNOWN) {
-            resolve(PermissionState.UNKNOWN.rawValue)
+            resolve(false)
             return
         }
         
-        resolve(state != .UNAUTHORIZED ? PermissionState.GRANTED.rawValue: PermissionState.BLOCKED.rawValue)
+        resolve(state != .UNAUTHORIZED)
     }
     
     func startScan(options: NSDictionary?, resolve: @escaping RCTPromiseResolveBlock) {

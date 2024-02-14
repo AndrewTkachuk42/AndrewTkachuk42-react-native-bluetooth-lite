@@ -112,8 +112,13 @@ class BluetoothLite: RCTEventEmitter {
     }
     
     @objc
-    func getPermissionStatus(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
-        bluetoothCentral.getPermissionStatus(resolve: resolve)
+    func checkPermission(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        bluetoothCentral.checkPermission(resolve: resolve)
+    }
+    
+    @objc
+    func requestPermission(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) -> Void {
+        bluetoothCentral.checkPermission(resolve: resolve)
     }
     
     @objc

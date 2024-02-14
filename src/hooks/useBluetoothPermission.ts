@@ -1,65 +1,54 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { PermissionResult } from '../types/types';
-import type { Bluetooth } from '../services/bluetooth';
-import { IS_IOS } from '../constants/constants';
+import { useOnAppStateActive } from './useOnAppStateActive';
+import {
+  checkPermission as checkPermissionService,
+  requestPermission as requestPermissionService,
+} from '../utils/permissions';
 
-export const useBluetoothPermission = (bluetooth: Bluetooth) => {
+export const useBluetoothPermission = (autoCheck: boolean = true) => {
   const [isGranted, setIsGranted] = useState(false);
-  const [status, setStatus] = useState(PermissionResult.NOT_REQUESTED);
-
-  const iosPermissionListener = useRef<(() => void) | null>(null);
 
   const checkPermission = useCallback(async () => {
-    const isPermissionGranted = await bluetooth.checkBluetoothPermission();
-
-    setIsGranted(isPermissionGranted);
-
-    if (isPermissionGranted || IS_IOS) {
-      setStatus(bluetooth._permissionStatus);
-      return isPermissionGranted;
-    }
-
-    return isPermissionGranted;
-  }, [bluetooth]);
-
-  const requestPermission = useCallback(async () => {
-    const result = await bluetooth.requestBluetoothPermission();
-
-    setStatus(bluetooth._permissionStatus);
-    setIsGranted(bluetooth._isPermissionGranted);
+    const result = await checkPermissionService();
+    setIsGranted(result);
 
     return result;
-  }, [bluetooth]);
+  }, []);
+
+  const requestPermission = useCallback(async () => {
+    const result = await requestPermissionService();
+
+    setIsGranted(result);
+
+    return result;
+  }, []);
+
+  const checkAndRequestPermission = useCallback(async () => {
+    const result = await checkPermission();
+
+    if (result) {
+      return result;
+    }
+
+    return requestPermission();
+  }, [checkPermission, requestPermission]);
+
+  useOnAppStateActive(checkPermission); // Refresh permission when app state changes to "active", as user might have allowed it in Settings
 
   useEffect(() => {
-    if (isGranted || bluetooth._isPermissionRequested || IS_IOS) {
+    // This effect checks permission on mount if autoCheck prop !== false
+    if (!autoCheck) {
       return;
     }
 
-    requestPermission();
-  }, [isGranted, requestPermission, bluetooth]);
+    checkAndRequestPermission();
+  }, [autoCheck, checkAndRequestPermission]);
 
-  useEffect(() => {
-    // Ios permission listener
-    if (isGranted) {
-      iosPermissionListener.current?.();
-      return;
-    }
-
-    iosPermissionListener.current = bluetooth.subscribeToIosPermission(
-      (event) => {
-        setIsGranted(event.isGranted);
-        setStatus(event.status);
-      }
-    );
-
-    return () => iosPermissionListener.current?.();
-  }, [isGranted, bluetooth]);
-
-  useEffect(() => {
-    checkPermission();
-  }, [checkPermission, bluetooth]);
-
-  return { isGranted, status, checkPermission, requestPermission };
+  return {
+    isGranted,
+    checkPermission,
+    requestPermission,
+    checkAndRequestPermission,
+  };
 };

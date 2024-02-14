@@ -60,7 +60,10 @@ RCT_EXTERN_METHOD(getConnectionState:(RCTPromiseResolveBlock)resolve
 RCT_EXTERN_METHOD(destroy:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
-RCT_EXTERN_METHOD(getPermissionStatus:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(checkPermission:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+
+RCT_EXTERN_METHOD(requestPermission:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(getAdapterState:(RCTPromiseResolveBlock)resolve

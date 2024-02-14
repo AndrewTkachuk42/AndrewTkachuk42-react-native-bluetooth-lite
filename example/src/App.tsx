@@ -2,7 +2,7 @@ import React from 'react';
 
 import { StyleSheet, View, Button, Text, SafeAreaView } from 'react-native';
 import { useTextStyle } from './hooks/useTextStyle';
-import type { ConnectionState, PermissionResult } from '../../src/types/types';
+import type { ConnectionState } from '../../src/types/types';
 import DeviceList from './DeviceList';
 import { useBluetooth } from './hooks/useBluetooth';
 import { strings } from './constants/strings';
@@ -25,14 +25,14 @@ const App = () => {
     isScanning,
     devices,
     isDeviceSelected,
-    permissionStatus,
+    isGranted,
   } = useBluetooth();
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Info
-          permissionStatus={permissionStatus}
+          isPermissionGranted={isGranted}
           isEnabled={isEnabled}
           connectionState={connectionState}
         />
@@ -59,15 +59,21 @@ export default App;
 type InfoProps = {
   isEnabled: boolean;
   connectionState: ConnectionState;
-  permissionStatus: PermissionResult | null;
+  isPermissionGranted: boolean;
 };
 
-const Info = ({ isEnabled, connectionState, permissionStatus }: InfoProps) => {
+const Info = ({
+  isEnabled,
+  connectionState,
+  isPermissionGranted,
+}: InfoProps) => {
   const textStyle = useTextStyle();
 
   return (
     <>
-      <Text style={textStyle}>{formatPermissionStatus(permissionStatus)}</Text>
+      <Text style={textStyle}>
+        {formatPermissionStatus(isPermissionGranted)}
+      </Text>
       <Text style={textStyle}>{formatAdapterStatus(isEnabled)}</Text>
       <Text style={textStyle}>{formatConnectionStatus(connectionState)}</Text>
     </>

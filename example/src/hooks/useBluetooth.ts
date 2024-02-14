@@ -11,7 +11,7 @@ import {
 const bluetooth = bluetoothManager.getInstance();
 
 export const useBluetooth = () => {
-  const { status: permissionStatus } = useBluetoothPermission(bluetooth);
+  const { isGranted } = useBluetoothPermission();
   const { isEnabled } = useAdapterState(bluetooth);
   const { isConnected, connectionState } = useConnectionState(bluetooth);
   const { devices, scan, isScanning } = useScaner(bluetooth, { duration: 2 });
@@ -53,6 +53,6 @@ export const useBluetooth = () => {
     connectionState,
     scan: scanHandler,
     isDeviceSelected: Boolean(selectedDevice),
-    permissionStatus,
+    isGranted,
   };
 };

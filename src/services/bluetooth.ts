@@ -14,15 +14,9 @@ import {
   type TransactionResponse,
   type DiscoverServices,
   type RequestMtu,
-  PermissionResult,
   AdapterState,
-  type IosPermissionCalback,
 } from '../types/types';
 import { DEFAULT_MTU_SIZE, IS_ANDROID } from '../constants/constants';
-import {
-  checkAndroidPermissions,
-  requestAndroidPermissions,
-} from '../utils/permissions';
 
 const LINKING_ERROR =
   `The package 'react-native-bluetooth-lite' doesn't seem to be linked. Make sure: \n\n` +
@@ -49,13 +43,8 @@ export class Bluetooth {
   private _notificationCallbacks: Record<string, AnyCallback | null> = {};
   private _adapterStateCallback: ((event: AdapterStateEvent) => void) | null =
     null;
-  private _iosPermissionCallback: IosPermissionCalback | null = null;
 
-  public _adapterState: AdapterState = AdapterState.UNKNOWN;
-  public _isAdapterEnabled: boolean = false;
-  public _isPermissionRequested: boolean = false;
-  public _permissionStatus: PermissionResult = PermissionResult.NOT_REQUESTED;
-  public _isPermissionGranted: boolean = false;
+  public _isEnabled: boolean = false;
 
   constructor() {
     this._bluetooth = getNativeModule();
@@ -159,7 +148,7 @@ export class Bluetooth {
   enableNotifications = async (
     serviceId: string,
     characteristicId: string,
-    callback: AnyCallback
+    callback: (data: Notification) => any
   ) => {
     const response = this._bluetooth.enableNotifications(
       serviceId,
@@ -206,41 +195,24 @@ export class Bluetooth {
       return result;
     }, {});
 
-  getAdapterState = async (): Promise<AdapterStateEvent> => {
-    const response: AdapterStateEvent = await this._bluetooth.getAdapterState();
-    this._adapterState = response.adapterState;
+  getIsAdapterEnabled = async (): Promise<boolean> => {
+    const isEnabled: boolean = await this._bluetooth.isEnabled();
+    this._isEnabled = isEnabled;
 
-    return response;
+    return isEnabled;
   };
 
   private setAdapterStateListener = async () => {
-    await this.getAdapterState();
+    await this.getIsAdapterEnabled();
 
     const onChange = (event: AdapterStateEvent) => {
       const { adapterState } = event;
 
-      this._adapterState = adapterState;
-      this._isAdapterEnabled = adapterState === AdapterState.ON;
+      this._isEnabled = adapterState === AdapterState.ON;
       this._adapterStateCallback?.(event);
-
-      this.checkIosPermissionStatus(adapterState);
     };
 
     this.subscribe(BluetoothEvent.ADAPTER_STATE, onChange);
-  };
-
-  private checkIosPermissionStatus = (adapterState: AdapterState) => {
-    if (IS_ANDROID) {
-      return;
-    }
-
-    const isPermissionGranted = adapterState !== AdapterState.UNAUTHORIZED;
-    this._iosPermissionCallback?.({
-      isGranted: isPermissionGranted,
-      status: isPermissionGranted
-        ? PermissionResult.GRANTED
-        : PermissionResult.BLOCKED,
-    });
   };
 
   subscribeToConnectionState = (callback: (event: StateEvent) => any) => {
@@ -267,56 +239,6 @@ export class Bluetooth {
 
   reset = () => {
     this.removeAllListeners();
-  };
-
-  subscribeToIosPermission = (callback: IosPermissionCalback) => {
-    if (IS_ANDROID) {
-      return null;
-    }
-
-    this._iosPermissionCallback = callback;
-
-    return () => {
-      this._iosPermissionCallback = null;
-    };
-  };
-
-  getIosPermissionStatus = async (): Promise<PermissionResult> =>
-    this._bluetooth.getPermissionStatus();
-
-  checkIosPermission = async (): Promise<boolean> => {
-    const status = await this.getIosPermissionStatus();
-
-    this._isPermissionGranted = status === PermissionResult.GRANTED;
-    this._permissionStatus = status;
-    this._isPermissionRequested = true;
-
-    return status === PermissionResult.GRANTED;
-  };
-
-  checkBluetoothPermission = async (): Promise<boolean> => {
-    const check = IS_ANDROID
-      ? checkAndroidPermissions
-      : this.checkIosPermission;
-
-    this._isPermissionGranted = await check();
-
-    return this._isPermissionGranted;
-  };
-
-  requestBluetoothPermission = async (): Promise<PermissionResult> => {
-    this._isPermissionRequested = true;
-
-    const getPermissionStatus = IS_ANDROID
-      ? requestAndroidPermissions
-      : this.getIosPermissionStatus;
-
-    const result = await getPermissionStatus();
-
-    this._permissionStatus = result;
-    this._isPermissionGranted = result === PermissionResult.GRANTED;
-
-    return result;
   };
 
   bytesToString = (bytes: number[] | null) =>

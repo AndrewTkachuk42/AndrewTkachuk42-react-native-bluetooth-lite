@@ -7,6 +7,6 @@ export const strings = {
   NAME: 'name',
   NO_NAME: 'no name',
   RSSI: 'rssi',
-  PERMISSION_STATUS: 'Permission status',
+  IS_PERMISSION_GRANTED: 'Is permission granted',
   NOT_REQUESTED: 'Not requested',
 };

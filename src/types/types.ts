@@ -20,7 +20,6 @@ export enum BluetoothEvent {
   DEVICE_FOUND = 'DEVICE_FOUND',
   ERROR = 'ERROR',
   NOTIFICATION = 'NOTIFICATION',
-  PERMISSION_STATE = 'PERMISSION_STATE',
 }
 
 export enum BluetoothError {
