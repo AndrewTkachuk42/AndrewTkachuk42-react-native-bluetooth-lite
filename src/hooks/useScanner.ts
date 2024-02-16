@@ -1,9 +1,10 @@
 import { useCallback, useState } from 'react';
 
 import type { DeviceData, ScanOptions } from '../types/types';
-import type { Bluetooth } from '../services/bluetooth';
+import { useBluetooth } from './useBluetooth';
 
-export const useScaner = (bluetooth: Bluetooth, options?: ScanOptions) => {
+export const useScaner = (options?: ScanOptions) => {
+  const { bluetooth } = useBluetooth();
   const [isScanning, setIsScanning] = useState(false);
   const [devices, setDevices] = useState<DeviceData[]>([]);
 

@@ -1,19 +1,20 @@
 import { Bluetooth } from './bluetooth';
 
 class BluetoothManager {
-  private _instance: Bluetooth | null;
+  static #instance: Bluetooth | null = null;
 
-  constructor() {
-    this._instance = null;
-  }
-
-  getInstance() {
-    if (!this._instance) {
-      this._instance = new Bluetooth();
+  get instance() {
+    if (!BluetoothManager.#instance) {
+      BluetoothManager.#instance = new Bluetooth();
     }
 
-    return this._instance;
+    return BluetoothManager.#instance;
   }
+
+  destroy = () => {
+    BluetoothManager.#instance?.destroy();
+    BluetoothManager.#instance = null;
+  };
 }
 
 export const bluetoothManager = new BluetoothManager();

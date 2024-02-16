@@ -1,20 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
+  useBluetooth,
   useAdapterState,
   useBluetoothPermission,
   useConnectionState,
   useScaner,
-  bluetoothManager,
 } from 'react-native-bluetooth-lite';
 
-const bluetooth = bluetoothManager.getInstance();
-
-export const useBluetooth = () => {
+export const useApp = () => {
+  const { bluetooth } = useBluetooth();
   const { isGranted } = useBluetoothPermission();
-  const { isEnabled } = useAdapterState(bluetooth);
-  const { isConnected, connectionState } = useConnectionState(bluetooth);
-  const { devices, scan, isScanning } = useScaner(bluetooth, { duration: 2 });
+  const { isEnabled } = useAdapterState();
+  const { isConnected, connectionState } = useConnectionState();
+  const { devices, scan, isScanning } = useScaner({ duration: 2 });
   const [selected, setSelected] = useState(-1);
 
   const scanHandler = useCallback(() => {
@@ -31,15 +30,15 @@ export const useBluetooth = () => {
     if (!selectedDevice) return;
 
     bluetooth.connect(selectedDevice.address, { duration: 2 });
-  }, [selectedDevice]);
+  }, [selectedDevice, bluetooth]);
 
-  const disconnect = useCallback(() => bluetooth.disconnect(), []);
+  const disconnect = useCallback(() => bluetooth.disconnect(), [bluetooth]);
 
   useEffect(() => {
     bluetooth.init({ autoDecodeBytes: true, timeoutDuration: 5 }); // optional
 
     return bluetooth.destroy;
-  }, []);
+  }, [bluetooth]);
 
   return {
     devices,

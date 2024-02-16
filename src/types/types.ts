@@ -42,6 +42,8 @@ export enum BluetoothError {
   TIMEOUT = 'TIMEOUT',
 }
 
+type ResponseError = { error: BluetoothError | null };
+
 export enum ConnectionState {
   DISCONNECTED = 'DISCONNECTED',
   CONNECTING = 'CONNECTING',
@@ -82,16 +84,18 @@ export type DeviceData = {
 export type ScanCallback = (device: DeviceData) => void;
 
 export type ScanResult = {
-  error: BluetoothError | null;
   devices: DeviceData[];
-};
+} & ResponseError;
 
 export type StartScan = (
   callback: ScanCallback | null,
   options?: ScanOptions
 ) => Promise<ScanResult>;
 
-export type Connect = (address: string, options?: ConnectOptions) => void;
+export type Connect = (
+  address: string,
+  options?: ConnectOptions
+) => Promise<{ isConnected: boolean } & ResponseError>;
 
 export type isEnabled = () => Promise<{ isEnabled: boolean }>;
 export type isConnected = () => Promise<{ isConnected: boolean }>;
@@ -118,12 +122,11 @@ export type AdapterStateEvent = {
 };
 
 export type TransactionResponse = {
-  error: BluetoothError | null;
   service: string | null;
   characteristic: string | null;
   value: number[] | string | null;
   isNotifying?: boolean;
-};
+} & ResponseError;
 
 export type Characteristic = {
   read: boolean;
@@ -139,15 +142,17 @@ type Services = Record<UUID, Record<UUID, Characteristic>>;
 export type DiscoverServices = (options: {
   services?: Record<UUID, UUID[]> | null;
   duration?: number;
-}) => Promise<{
-  error: BluetoothError | null;
-  services: Services;
-}>;
+}) => Promise<
+  {
+    services: Services;
+  } & ResponseError
+>;
 
-export type RequestMtu = (size?: number) => Promise<{
-  error: BluetoothError | null;
-  mtu: number;
-}>;
+export type RequestMtu = (size?: number) => Promise<
+  {
+    mtu: number;
+  } & ResponseError
+>;
 
 export enum AndroidPermissionStatus {
   GRANTED = 'granted',

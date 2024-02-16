@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ConnectionState, type StateEvent } from '../types/types';
-import type { Bluetooth } from '../services/bluetooth';
 
-export const useConnectionState = (bluetooth: Bluetooth) => {
+import { ConnectionState, type StateEvent } from '../types/types';
+import { useBluetooth } from './useBluetooth';
+
+export const useConnectionState = () => {
+  const { bluetooth } = useBluetooth();
+
   const [connectionState, setConnectionState] = useState(
     ConnectionState.DISCONNECTED
   );

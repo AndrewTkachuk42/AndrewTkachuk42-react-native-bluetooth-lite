@@ -4,7 +4,7 @@ import { StyleSheet, View, Button, Text, SafeAreaView } from 'react-native';
 import { useTextStyle } from './hooks/useTextStyle';
 import type { ConnectionState } from '../../src/types/types';
 import DeviceList from './DeviceList';
-import { useBluetooth } from './hooks/useBluetooth';
+import { useApp } from './hooks/useApp';
 import { strings } from './constants/strings';
 import {
   formatAdapterStatus,
@@ -26,7 +26,7 @@ const App = () => {
     devices,
     isDeviceSelected,
     isGranted,
-  } = useBluetooth();
+  } = useApp();
 
   return (
     <SafeAreaView style={styles.safeArea}>

@@ -4,16 +4,14 @@ import {
   type AdapterStateEvent,
   type AnyCallback,
 } from '../types/types';
-import type { Bluetooth } from '../services/bluetooth';
+import { useBluetooth } from './useBluetooth';
 
-export const useAdapterState = (
-  bluetooth: Bluetooth,
-  onStateChange?: AnyCallback
-) => {
+export const useAdapterState = (onStateChange?: AnyCallback) => {
+  const { bluetooth } = useBluetooth();
   const [isEnabled, setIsEnabled] = useState(false);
 
   const isAdapterEnabled = useCallback(async () => {
-    const result = await bluetooth.isEnabled();
+    const result = await bluetooth.isAdapterEnabled();
     setIsEnabled(result.isEnabled);
   }, [bluetooth]);
 
