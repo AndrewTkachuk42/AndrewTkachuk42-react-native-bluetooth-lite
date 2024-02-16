@@ -8,12 +8,14 @@ import {
   useScaner,
 } from 'react-native-bluetooth-lite';
 
+const scanOptions = { duration: 2 };
+
 export const useApp = () => {
   const { bluetooth } = useBluetooth();
   const { isGranted } = useBluetoothPermission();
   const { isEnabled } = useAdapterState();
   const { isConnected, connectionState } = useConnectionState();
-  const { devices, scan, isScanning } = useScaner({ duration: 2 });
+  const { devices, scan, isScanning } = useScaner(scanOptions);
   const [selected, setSelected] = useState(-1);
 
   const scanHandler = useCallback(() => {
