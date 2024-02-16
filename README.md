@@ -10,7 +10,7 @@ npm install react-native-bluetooth-lite
 
 ### Android
 
-1. Add bluetooth permissions to your `android/app/src/main/AndroidManifest.xml`. Also, don't forget to add "xmlns:tools" atribute to your <manifest> tag.
+1. Add bluetooth permissions to your `android/app/src/main/AndroidManifest.xml`. Also, don't forget to add "xmlns:tools" atribute to manifest tag.
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -53,11 +53,11 @@ cd ios && pod install
 
 ### Requset bluetooth permission
 
-Bluetoot permission is a runtime permission. So you need to ask a user for a permission to use bluetooth.
-you can import permission related utilities from useCameraPermission hook.
+Bluetoot permission is a runtime permission. So you need to ask user a permission to use bluetooth.
+you can import permission related utilities from useBluetoothPermission hook.
 
 ```js
-import { useBluetoothPermission } from "react-native-qr-code-scanner-lite";
+import { useBluetoothPermission } from 'react-native-bluetooth-lite';
 
 const App = () => {
 
@@ -107,7 +107,9 @@ const App = () => {
       return;
     }
 
-    setDeviceAdress(devices[0]?.address!);
+    const [device] = devices;
+
+    setDeviceAdress(device?.address);
   }, [isScanning, devices]);
 
   if (!isEnabled) {
