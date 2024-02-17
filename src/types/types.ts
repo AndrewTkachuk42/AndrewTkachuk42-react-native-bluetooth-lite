@@ -92,10 +92,14 @@ export type StartScan = (
   options?: ScanOptions
 ) => Promise<ScanResult>;
 
+export type ConnectionResponse = { isConnected: boolean } & ResponseError;
+
 export type Connect = (
   address: string,
   options?: ConnectOptions
-) => Promise<{ isConnected: boolean } & ResponseError>;
+) => Promise<ConnectionResponse>;
+
+export type Disconnect = () => Promise<ConnectionResponse>;
 
 export type isEnabled = () => Promise<{ isEnabled: boolean }>;
 export type isConnected = () => Promise<{ isConnected: boolean }>;

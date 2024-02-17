@@ -78,10 +78,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Button, Text, View } from 'react-native';
 
 import {
-  useBluetooth,
   useAdapterState,
-  useConnectionState,
   useScaner,
+  useConnection,
 } from 'react-native-bluetooth-lite';
 
 const scanOptions = { duration: 2, name: 'my device', findOne: true };
@@ -89,28 +88,27 @@ const scanOptions = { duration: 2, name: 'my device', findOne: true };
 const App = () => {
   const [deviceAddress, setDeviceAdress] = useState('');
 
-  const { bluetooth } = useBluetooth();
   const { isEnabled } = useAdapterState();
   const { scan, isScanning, devices } = useScaner(scanOptions);
-  const { isConnected, connectionState } = useConnectionState();
+  const { connect, disconnect, isConnected } = useConnection();
 
-  const connect = useCallback(() => {
+  const connectHandler = useCallback(() => {
     if (!deviceAddress) {
       return;
     }
 
-    bluetooth.connect(deviceAddress, { duration: 2 });
-  }, [deviceAddress, bluetooth]);
+    connect(deviceAddress, { duration: 2 });
+  }, [deviceAddress, connect]);
 
   useEffect(() => {
-    if (isScanning || !devices.length) {
+    const [device] = devices;
+
+    if (!device) {
       return;
     }
 
-    const [device] = devices;
-
     setDeviceAdress(device?.address);
-  }, [isScanning, devices]);
+  }, [devices]);
 
   if (!isEnabled) {
     return (
@@ -123,7 +121,7 @@ const App = () => {
   return (
     <View>
       <Button title="scan" onPress={scan} />
-      <Button title="connect" onPress={connect} />
+      <Button title="connect" onPress={connectHandler} />
     </View>
   );
 };

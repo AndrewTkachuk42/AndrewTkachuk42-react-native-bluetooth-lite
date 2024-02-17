@@ -15,6 +15,7 @@ import {
   type DiscoverServices,
   type RequestMtu,
   AdapterState,
+  type Disconnect,
 } from '../types/types';
 import { DEFAULT_MTU_SIZE, IS_ANDROID } from '../constants/constants';
 import { getNativeModule } from '../utils/nativeModule';
@@ -73,7 +74,7 @@ export class Bluetooth {
   connect: Connect = (address, options) =>
     this.#bluetooth.connect(address, options);
 
-  disconnect = () => this.#bluetooth.disconnect();
+  disconnect: Disconnect = () => this.#bluetooth.disconnect();
 
   isAdapterEnabled: isEnabled = () => this.#bluetooth.isEnabled();
 
